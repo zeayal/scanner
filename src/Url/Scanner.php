@@ -1,6 +1,8 @@
 <?php
 namespace Zeayal\Scan\Url;
 
+use GuzzleHttp\Client;
+
 class Scanner {
 
 	/**
@@ -21,6 +23,7 @@ class Scanner {
 	public function __construct(array $urls)
 	{
 		$this->urls = $urls;
+		$this->httpClient = new Client(); 
 	}
 
 	public function getInvalidUrls()
@@ -30,7 +33,7 @@ class Scanner {
 			$statusCode = $this->getStatusCodeForUrl($url);
 			if ($statusCode >= 400) {
 				# code...
-				array_push($invalidUrls, $url)
+				array_push($invalidUrls, $url);
 			}
 		}
 		return $invalidUrls;
@@ -40,8 +43,8 @@ class Scanner {
 	{
 		$statusCode;
 		try {
-			$statusCode = $this->httpClient->request('OPTIONS', $url);
-		} catch (\Exception e) {
+			$statusCode = $this->httpClient->request('OPTIONS', $url)->getStatusCode();
+		} catch (\Exception $e) {
 			$statusCode = 500;
 		}
 		return $statusCode;
